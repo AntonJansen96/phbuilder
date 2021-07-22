@@ -50,29 +50,33 @@ def parseLambdaGroupTypesFile():
     # Loop through the sections.
     for sect in parser.sections():
 
+        # Force field
         if (sect.strip() == "FORCEFIELD"):
             universe.add('d_modelFF', parser.get(sect, 'path'))
             universe.add('d_modelwater', parser.get(sect, 'water'))
-            continue
 
-        if (sect.strip() == "BUF"):
-            universe.add('ph_BUF_dvdl', str2floatList(parser.get(sect, 'dvdl')))
-            continue
+        # This groupname is reserved for buffers.
+        elif (sect.strip() == "BUF"):
+            groupname = sect.strip()
+            incl      = ''
+            pKa       = 0
+            atoms     = parser.get(sect, 'atoms')
+            qqA       = float(parser.get(sect, 'qqA'))
+            qqB       = float(parser.get(sect, 'qqB'))
+            dvdl      = str2floatList(parser.get(sect, 'dvdl'))
+            
+            defineLambdaType(groupname, incl, pKa, atoms, qqA, qqB, dvdl)
 
-        groupname = sect.strip()
-        pKa       = parser.getfloat(sect, 'pKa')
-        incl      = str2strList(parser.get(sect, 'incl'))
-        atoms     = str2strList(parser.get(sect, 'atoms'))
-        qqA       = str2floatList(parser.get(sect, 'qqA'))
-        qqB       = str2floatList(parser.get(sect, 'qqB'))
-        dvdl      = str2floatList(parser.get(sect, 'dvdl'))
+        else:
+            groupname = sect.strip()
+            incl      = str2strList(parser.get(sect, 'incl'))
+            pKa       = parser.getfloat(sect, 'pKa')
+            atoms     = str2strList(parser.get(sect, 'atoms'))
+            qqA       = str2floatList(parser.get(sect, 'qqA'))
+            qqB       = str2floatList(parser.get(sect, 'qqB'))
+            dvdl      = str2floatList(parser.get(sect, 'dvdl'))
 
-        # Sanitize input of groupname.
-        if (len(groupname) < 2 or len(groupname) > 4):
-            utils.error("groupname of LambdaType needs to contain between 2 and 4 characters.")
-
-        # Call function that constructs the LambdaType object and adds it to universe.
-        defineLambdaType(groupname, incl, pKa, atoms, qqA, qqB, dvdl)
+            defineLambdaType(groupname, incl, pKa, atoms, qqA, qqB, dvdl)
 
     # User update.
     utils.update("ffpath    = {}".format(universe.get('d_modelFF')))
@@ -87,8 +91,8 @@ def parseLambdaGroupTypesFile():
         utils.update("qqB       = {}".format(obj.d_qqB))
         utils.update("dvdl      = {}\n".format(obj.d_dvdl))
 
-    if (universe.has('ph_BUF_dvdl')):
-        utils.update("BUF_dvdl  = {}\n".format(universe.get('ph_BUF_dvdl')))
-    else:
-        utils.update("dvdl coefficients for buffer were not found in lambdagrouptypes.dat.")
-        utils.update("This is fine if you don't plan on using charge restraining/buffers.")
+    # if (universe.has('ph_BUF_dvdl')):
+    #     utils.update("BUF_dvdl  = {}\n".format(universe.get('ph_BUF_dvdl')))
+    # else:
+    #     utils.update("dvdl coefficients for buffer were not found in lambdagrouptypes.dat.")
+    #     utils.update("This is fine if you don't plan on using charge restraining/buffers.")
