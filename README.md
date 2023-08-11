@@ -1,5 +1,7 @@
 <div style="width: 830px">
 
+### This repository is no longer maintained. For the active version of phbuilder, please see: https://gitlab.com/gromacs-constantph/phbuilder.
+
 [![GitHub issues](https://img.shields.io/badge/issue_tracking-github-blue.svg)](https://github.com/AntonJansen96/phbuilder/issues)
 
 <p align="center">
